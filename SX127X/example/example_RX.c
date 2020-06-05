@@ -3,25 +3,17 @@
 #include "hal/sx127x_hal.h"
 #include "string.h"
 
-/*
- * Copyright (c) 2019-2020 AIThinker.yangbin All rights reserved.
- *
- * 本工程只是SX127X的驱动demo，仅供参考，不保证商用稳定性。
- *
- * author     Specter
- *
- * 这个函数用来进行接收测试，需要另一个模块配合发送
- */
  
-//配合main函数使用的接收demo，需要轮询调用（不要同时跑多个demo，容易造成混乱）
+//需要轮询调用（不要同时跑多个demo，容易造成混乱）
 void exampleRx(void){
-	tRFProcessReturnCodes processRet=RF_IDLE;
+	tRFProcessReturnCodes processRet=RF_IDLE;	/* 置为空闲态 */
 	uint8_t rxBuf[128]={0};
 	uint16_t rxCount=128;
 	
 	processRet=g_Radio.Process();
+	
 	switch(processRet){
-		case RF_IDLE:	//空闲状态
+		case RF_IDLE:			//空闲状态
 			g_Radio.StartRx(3000);
 			break;
     case RF_RX_DONE:	//接收完成

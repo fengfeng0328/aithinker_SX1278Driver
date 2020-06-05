@@ -17,7 +17,15 @@ static void SX127xSetTxPacket( const void *buffer, uint16_t size,uint32_t timeou
 static void Sx127xReadRxPackage( void *buffer, uint16_t *size );
 static void Sx127xStartCADCheck(void);
 
-tRadioDriver g_Radio ={sx127xInit,Sx127xRestart,Sx127xStartRx,Sx127xReadRxPackage,SX127xSetTxPacket,Sx127xStartCADCheck,SX127xProcess};
+tRadioDriver g_Radio ={
+sx127xInit,
+Sx127xRestart,
+Sx127xStartRx,
+Sx127xReadRxPackage,
+SX127xSetTxPacket,
+Sx127xStartCADCheck,
+SX127xProcess
+};
 
 static void SX1278ReadBuffer(uint8_t addr,uint8_t *buffer,uint8_t size);
 static void SX1278WriteBuffer(uint8_t addr,uint8_t *buffer,uint8_t size);
@@ -42,13 +50,14 @@ void sx127xInit(tLoRaSettings *stting){
 	}
 	DEBUG("spi init ok\r\n");
 	
-	SX127xSetLoRaMode();
+	SX127xSetLoRaMode();		/* LORA调制解调模式 */
 	
-	if(NULL!=stting){
+	if(NULL!=stting){				/* 判定传参是否NULL */
 		memcpy(&localSettingSave,stting,sizeof(tLoRaSettings));	//复制配置信息
 	}
 	stting=&localSettingSave;	//setting指向备份数据，避免修改导致setting原值改变
 	
+	/* 下面是一些传参范围判定 */
 	if(stting->SignalBw>9){
 		DEBUG("[WARRING %s()-%d]setting error,auto fix\r\n",__func__,__LINE__);
 		stting->SignalBw=9;
@@ -74,11 +83,11 @@ void sx127xInit(tLoRaSettings *stting){
 		stting->Power=20;
 	}
 	
-	SX127xSetFrf(stting->RFFrequency);//设置频率
-	Write127xReg(REG_LR_MODEMCONFIG1,u8_BWList[stting->SignalBw]|u8_CRList[stting->ErrorCoding -1]|RFLR_MODEMCONFIG1_IMPLICITHEADER_OFF);//设置带宽、纠错编码率
-	Write127xReg(REG_LR_MODEMCONFIG2,u8_SFList[stting->SpreadingFactor-6] | RFLR_MODEMCONFIG2_TXCONTINUOUSMODE_OFF|RFLR_MODEMCONFIG2_RXPAYLOADCRC_ON|0x03);//设置SD，CRC，超时时间
-	Write127xReg(REG_LR_SYMBTIMEOUTLSB,0xFF);//设置超时时间
-	Write127xReg(REG_LR_MODEMCONFIG3,0x0C);//设置低速率(包长超过16ms必须打开)
+	SX127xSetFrf(stting->RFFrequency);	//设置频率
+	Write127xReg(REG_LR_MODEMCONFIG1,u8_BWList[stting->SignalBw]|u8_CRList[stting->ErrorCoding -1]|RFLR_MODEMCONFIG1_IMPLICITHEADER_OFF);	//设置带宽、纠错编码率
+	Write127xReg(REG_LR_MODEMCONFIG2,u8_SFList[stting->SpreadingFactor-6] | RFLR_MODEMCONFIG2_TXCONTINUOUSMODE_OFF|RFLR_MODEMCONFIG2_RXPAYLOADCRC_ON|0x03);	//设置SD，CRC，超时时间
+	Write127xReg(REG_LR_SYMBTIMEOUTLSB,0xFF);	//设置超时时间
+	Write127xReg(REG_LR_MODEMCONFIG3,0x0C);		//设置低速率(包长超过16ms必须打开)
 	
 	if(stting->Power>17){
 		Write127xReg(REG_LR_PACONFIG,0x80+stting->Power-5);//设置功率

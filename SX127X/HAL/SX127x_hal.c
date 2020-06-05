@@ -47,7 +47,7 @@
 #define DIO4_IOPORT                                 GPIOA
 #define DIO4_PIN                                    GPIO_Pin_0
 
-//软件延时函数，ms级别
+// 软件延时函数，MS级别
 void Soft_delay_ms(u16 time)
 {    
    u16 i=0;  
@@ -58,7 +58,7 @@ void Soft_delay_ms(u16 time)
    }
 }
 
-//spi初始化
+// SPI初始化
 static void SpiInit( void )
 {
     SPI_InitTypeDef SPI_InitStructure;
@@ -74,13 +74,13 @@ static void SpiInit( void )
     GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
     GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF_PP;
 
-    GPIO_InitStructure.GPIO_Pin = SPI_PIN_SCK;
+    GPIO_InitStructure.GPIO_Pin = SPI_PIN_SCK;	/* 时钟信号输出，由主设备提供 */
     GPIO_Init( SPI_PIN_SCK_PORT, &GPIO_InitStructure );
 
-    GPIO_InitStructure.GPIO_Pin = SPI_PIN_MOSI;
+    GPIO_InitStructure.GPIO_Pin = SPI_PIN_MOSI;	/* SPI输入 */
     GPIO_Init( SPI_PIN_MOSI_PORT, &GPIO_InitStructure );
 
-    GPIO_InitStructure.GPIO_Pin = SPI_PIN_MISO;
+    GPIO_InitStructure.GPIO_Pin = SPI_PIN_MISO;	/* SPI输出 */
     GPIO_Init( SPI_PIN_MISO_PORT, &GPIO_InitStructure );
 
     //禁用JTAG
@@ -88,8 +88,8 @@ static void SpiInit( void )
     GPIO_PinRemapConfig( GPIO_Remap_SWJ_JTAGDisable, ENABLE );
 
     /* SPI_INTERFACE Config -------------------------------------------------------------*/
-    SPI_InitStructure.SPI_Direction = SPI_Direction_2Lines_FullDuplex;
-    SPI_InitStructure.SPI_Mode = SPI_Mode_Master;
+    SPI_InitStructure.SPI_Direction = SPI_Direction_2Lines_FullDuplex;	// 双线全双工模式
+    SPI_InitStructure.SPI_Mode = SPI_Mode_Master;			// 主机模式
     SPI_InitStructure.SPI_DataSize = SPI_DataSize_8b;
     SPI_InitStructure.SPI_CPOL = SPI_CPOL_Low;
     SPI_InitStructure.SPI_CPHA = SPI_CPHA_1Edge;
@@ -97,8 +97,9 @@ static void SpiInit( void )
     SPI_InitStructure.SPI_BaudRatePrescaler = SPI_BaudRatePrescaler_8; // 72/8 MHz
     SPI_InitStructure.SPI_FirstBit = SPI_FirstBit_MSB;
     SPI_InitStructure.SPI_CRCPolynomial = 7;
-    SPI_Init( SPI_INTERFACE, &SPI_InitStructure );
-    SPI_Cmd( SPI_INTERFACE, ENABLE );
+		
+    SPI_Init( SPI_INTERFACE, &SPI_InitStructure );	/* SPI1接口进行配置 */
+    SPI_Cmd( SPI_INTERFACE, ENABLE );								/* 使能SPI1接口功能 */
 }
 
 

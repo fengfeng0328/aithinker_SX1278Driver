@@ -7,13 +7,7 @@
 #include "example/example_RX.h"
 #include "example/example_CAD.h"
 
-/*
- * Copyright (c) 2019-2020 AIThinker.yangbin All rights reserved.
- *
- * 本工程只是SX127X的驱动demo，仅供参考，不保证商用稳定性。
- *
- * author     Specter
- */
+
 #define TEST_MOD	1	//测试模式 1表示非阻塞式模式，0表示阻塞式模式
 #if !TEST_MOD
 	#define IS_TX_MOD 1	//1表示发送模式，0表示接收模式(仅阻塞模式生效)
@@ -58,26 +52,27 @@ void uartInit(){
 
 	USART_DeInit(USART2);  //复位串口
 	
-	RCC_APB1PeriphClockCmd(RCC_APB1Periph_USART2, ENABLE);//注意APB1和APB2时钟使能函数不一样
+	RCC_APB1PeriphClockCmd(RCC_APB1Periph_USART2, ENABLE);		//注意APB1和APB2时钟使能函数不一样
 	RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOA, ENABLE);	    //使能指定端口时钟
-	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;	 //IO口速度为50MHz，这里不用传参，直接写死用最大速度50MHZ
+	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;	 				//IO口速度为50MHz，这里不用传参，直接写死用最大速度50MHZ
+	
 	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_2;
 	GPIO_InitStructure.GPIO_Mode=GPIO_Mode_AF_PP;
-	GPIO_Init(GPIOA, &GPIO_InitStructure);	//初始化GPIO
+	GPIO_Init(GPIOA, &GPIO_InitStructure);					//初始化GPIO
 	
 	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_3;
 	GPIO_InitStructure.GPIO_Mode=GPIO_Mode_IN_FLOATING;
-	GPIO_Init(GPIOA, &GPIO_InitStructure);	//初始化GPIO
+	GPIO_Init(GPIOA, &GPIO_InitStructure);					//初始化GPIO
 	
 	//USART配置
-	USART_InitStructure.USART_BaudRate = 115200;	//设置串口波特率
-	USART_InitStructure.USART_WordLength = USART_WordLength_8b;	//字长为8
-	USART_InitStructure.USART_StopBits = USART_StopBits_1;	//1个停止位
-	USART_InitStructure.USART_Parity = USART_Parity_No;	//无奇偶校验
+	USART_InitStructure.USART_BaudRate = 115200;									//设置串口波特率
+	USART_InitStructure.USART_WordLength = USART_WordLength_8b;		//字长为8
+	USART_InitStructure.USART_StopBits = USART_StopBits_1;				//1个停止位
+	USART_InitStructure.USART_Parity = USART_Parity_No;						//无奇偶校验
 	USART_InitStructure.USART_HardwareFlowControl = USART_HardwareFlowControl_None;	//无流控
 	USART_InitStructure.USART_Mode = USART_Mode_Rx | USART_Mode_Tx;	//收发模式
-	USART_Init(USART2, &USART_InitStructure); //配置USART参数
-	USART_Cmd(USART2, ENABLE);                    //使能USART
+	USART_Init(USART2, &USART_InitStructure); 											//配置USART参数
+	USART_Cmd(USART2, ENABLE);                    									//使能USART
 }
 
 void delayMsBySystick(uint32_t timeoutMs){
@@ -97,19 +92,33 @@ void delayMsBySystick(uint32_t timeoutMs){
 		}
 	}
 }
+
+/* 程序函数入口 */
 int main(void){
-	tLoRaSettings stting={435000000,20,7,12,1,0x0005};	//频率435M，功率20dbm，带宽125kHz，SF=12，误码编码率4/5,前导码长度0x0005
 	
-	SysTick_Config(SystemCoreClock/1000);
-	uartInit();
-	printf("version:%s\r\n",VERSION);
+	tLoRaSettings setting={
+	435000000,		/* 频率配置 435MHZ */
+	20,						/* 功率配置 20dBm*/
+	7,						/* 带宽配置 125kHz */
+	12,						/* 扩频因子 12 */
+	1,						/* 纠错编码 4/5*/
+	0x0005				/* 前导码 0x005 */
+	};
 	
-	g_Radio.Init(&stting);	//初始化配置
-	printf("init OK\r\n");
+	SysTick_Config(SystemCoreClock/1000);	/* 时钟滴答设置成1MS */
+	
+	uartInit();		/* UART2 INIT */
+	
+	printf("aithinker Lora-version:%s\r\n",VERSION);
+	
+	g_Radio.Init(&setting);	//初始化配置
+	
+	printf("aithinker Lora-init OK\r\n");
+	
 	while(1){
 		#if TEST_MOD
 			//非阻塞测试
-			exampleTx();	//发送测试，发送完成等待1s后再次发送
+			exampleTx();		//发送测试，发送完成等待1s后再次发送
 			//exampleRx();	//循环接收
 			//exampleCAD();	//CAD循环检测测试
 		#else	//else of #if IS_TX_MOD
@@ -125,6 +134,7 @@ int main(void){
 				rxCount=255;
 				memset(rxBuf,0,255);
 				printf("start rx\r\n");
+				
 				u8_ret=sx127xRx(rxBuf,&rxCount,1000);	//接收数据，rxBuf存储数据内容，rxCount存储接收到的数据长度，软件超时1000Ms
 				switch(u8_ret){
 					case 0:
