@@ -3,4 +3,4 @@
 
 void exampleRx(void);
 
-#endif	//end of __EXAMPLE_RX__
+#endif  //end of __EXAMPLE_RX__

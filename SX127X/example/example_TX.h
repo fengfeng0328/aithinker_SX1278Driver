@@ -3,4 +3,4 @@
 
 void exampleTx(void);
 
-#endif	//end of __EXAMPLE_TX_H__
+#endif  //end of __EXAMPLE_TX_H__
