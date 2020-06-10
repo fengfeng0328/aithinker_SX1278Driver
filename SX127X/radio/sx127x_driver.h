@@ -41,14 +41,14 @@ typedef enum
 
 typedef enum
 {
-    LORA_OPMODE_SLEEP = 0,
-    LORA_OPMODE_STANDBY,
-    LORA_OPMODE_SYNTHESIZER_TX,
-    LORA_OPMODE_TRANSMITTER,
-    LORA_OPMODE_SYNTHESIZER_RX,
-    LORA_OPMODE_RECEIVER,
-    LORA_OPMODE_RECIVER_SINGLE,
-    LORA_OPMODE_CAD,
+    LORA_OPMODE_SLEEP = 0,				/* 睡眠 */
+    LORA_OPMODE_STANDBY,				/* 待机 */
+    LORA_OPMODE_SYNTHESIZER_TX,			/* 频率合成发送 */
+    LORA_OPMODE_TRANSMITTER,			/* 发送 */
+    LORA_OPMODE_SYNTHESIZER_RX,			/* 频率合成接收 */
+    LORA_OPMODE_RECEIVER,				/* 持续接收 */
+    LORA_OPMODE_RECIVER_SINGLE,			/* 单次接收 */
+    LORA_OPMODE_CAD,					/* 信道活动检测 */
 } LoRaOpModeType;						/* 硬件工作模式 */
 
 //驱动结构体，用来保存相关操作的函数

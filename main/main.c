@@ -53,17 +53,17 @@ void uartInit()
 
     USART_DeInit(USART2);  //复位串口
 
-    RCC_APB1PeriphClockCmd(RCC_APB1Periph_USART2, ENABLE);      //注意APB1和APB2时钟使能函数不一样
-    RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOA, ENABLE);       //使能指定端口时钟
-    GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;           //IO口速度为50MHz，这里不用传参，直接写死用最大速度50MHZ
+    RCC_APB1PeriphClockCmd(RCC_APB1Periph_USART2, ENABLE);      // RCC_APB1Periph_USART2 时钟使能
+    RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOA, ENABLE);       // RCC_APB2Periph_GPIOA  时钟使能
+    GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;           // GPIO 翻转速度为50MHz
 
     GPIO_InitStructure.GPIO_Pin = GPIO_Pin_2;
     GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF_PP;
-    GPIO_Init(GPIOA, &GPIO_InitStructure);                  	//初始化GPIO
+    GPIO_Init(GPIOA, &GPIO_InitStructure);                  	// 初始化GPIO
 
     GPIO_InitStructure.GPIO_Pin = GPIO_Pin_3;
     GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IN_FLOATING;
-    GPIO_Init(GPIOA, &GPIO_InitStructure);                  	//初始化GPIO
+    GPIO_Init(GPIOA, &GPIO_InitStructure);                  	// 初始化GPIO
 
     //USART配置
     USART_InitStructure.USART_BaudRate = 115200;                                    //设置串口波特率
@@ -71,7 +71,7 @@ void uartInit()
     USART_InitStructure.USART_StopBits = USART_StopBits_1;              			//1个停止位
     USART_InitStructure.USART_Parity = USART_Parity_No;                     		//无奇偶校验
     USART_InitStructure.USART_HardwareFlowControl = USART_HardwareFlowControl_None; //无流控
-    USART_InitStructure.USART_Mode = USART_Mode_Rx | USART_Mode_Tx; //收发模式
+    USART_InitStructure.USART_Mode = USART_Mode_Rx | USART_Mode_Tx; 				//收发模式
     USART_Init(USART2, &USART_InitStructure);                                       //配置USART参数
     USART_Cmd(USART2, ENABLE);                                                      //使能USART
 }
@@ -104,7 +104,8 @@ void delayMsBySystick(uint32_t timeoutMs)
 /* 程序函数入口 */
 int main(void)
 {
-
+	
+	/* -------------------------------------------------------------------- */
     tLoRaSettings setting =
     {
         435000000,      		/* 频率配置 435MHZ */
@@ -112,8 +113,11 @@ int main(void)
         7,                      /* 带宽配置 125kHz */
         12,                     /* 扩频因子 12 */
         1,                      /* 纠错编码 4/5*/
-        0x0005              	/* 前导码 0x005 */
+        0x0005              	/* 前导码 0x0005 */
     };
+
+
+	/* -------------------------------------------------------------------- */
 
     SysTick_Config(SystemCoreClock / 1000); /* 时钟滴答设置成1MS */
 

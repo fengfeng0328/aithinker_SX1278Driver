@@ -14,8 +14,8 @@
 /*!
  * SX1276 SPI definitions
  */
-#define NSS_IOPORT                                  GPIOA
-#define NSS_PIN                                     GPIO_Pin_4
+#define NSS_IOPORT                                  GPIOA			// 基始地址
+#define NSS_PIN                                     GPIO_Pin_4		// 偏移地址
 
 #define SPI_INTERFACE                               SPI1
 #define SPI_CLK                                     RCC_APB2Periph_SPI1
@@ -72,15 +72,15 @@ static void SpiInit(void)
 
     /* GPIO configuration ------------------------------------------------------*/
     GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
-    GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF_PP;
+    GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF_PP;		/* 复用推挽输出 */
 
-    GPIO_InitStructure.GPIO_Pin = SPI_PIN_SCK;  /* 时钟信号输出，由主设备提供 */
+    GPIO_InitStructure.GPIO_Pin = SPI_PIN_SCK;  		/* 时钟信号输出，由主设备提供 */
     GPIO_Init(SPI_PIN_SCK_PORT, &GPIO_InitStructure);
 
-    GPIO_InitStructure.GPIO_Pin = SPI_PIN_MOSI; /* SPI输入 */
+    GPIO_InitStructure.GPIO_Pin = SPI_PIN_MOSI; 		/* SPI输入 */
     GPIO_Init(SPI_PIN_MOSI_PORT, &GPIO_InitStructure);
 
-    GPIO_InitStructure.GPIO_Pin = SPI_PIN_MISO; /* SPI输出 */
+    GPIO_InitStructure.GPIO_Pin = SPI_PIN_MISO; 		/* SPI输出 */
     GPIO_Init(SPI_PIN_MISO_PORT, &GPIO_InitStructure);
 
     //禁用JTAG
@@ -89,17 +89,17 @@ static void SpiInit(void)
 
     /* SPI_INTERFACE Config -------------------------------------------------------------*/
     SPI_InitStructure.SPI_Direction = SPI_Direction_2Lines_FullDuplex;  // 双线全双工模式
-    SPI_InitStructure.SPI_Mode = SPI_Mode_Master;           // 主机模式
+    SPI_InitStructure.SPI_Mode = SPI_Mode_Master;           			// 主机模式
     SPI_InitStructure.SPI_DataSize = SPI_DataSize_8b;
     SPI_InitStructure.SPI_CPOL = SPI_CPOL_Low;
     SPI_InitStructure.SPI_CPHA = SPI_CPHA_1Edge;
     SPI_InitStructure.SPI_NSS = SPI_NSS_Soft;
-    SPI_InitStructure.SPI_BaudRatePrescaler = SPI_BaudRatePrescaler_8; // 72/8 MHz
+    SPI_InitStructure.SPI_BaudRatePrescaler = SPI_BaudRatePrescaler_8; 	// 72/8 MHz
     SPI_InitStructure.SPI_FirstBit = SPI_FirstBit_MSB;
     SPI_InitStructure.SPI_CRCPolynomial = 7;
 
-    SPI_Init(SPI_INTERFACE, &SPI_InitStructure);     /* SPI1接口进行配置 */
-    SPI_Cmd(SPI_INTERFACE, ENABLE);                                  /* 使能SPI1接口功能 */
+    SPI_Init(SPI_INTERFACE, &SPI_InitStructure);     					/* SPI1接口进行配置 */
+    SPI_Cmd(SPI_INTERFACE, ENABLE);                                  	/* 使能SPI1接口功能 */
 }
 
 
@@ -113,14 +113,16 @@ void SX1276HALInit(void)
 
 
     RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOA | RCC_APB2Periph_GPIOB |
-                           RCC_APB2Periph_GPIOC | RCC_APB2Periph_GPIOD | RCC_APB2Periph_GPIOE | RCC_APB2Periph_AFIO, ENABLE);
+                           RCC_APB2Periph_GPIOC | RCC_APB2Periph_GPIOD | RCC_APB2Periph_GPIOE | RCC_APB2Periph_AFIO, ENABLE);	/* 启用高速APB2外围时钟 */
 
-    GPIO_InitStructure.GPIO_Mode  = GPIO_Mode_Out_PP;
-    GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
+    GPIO_InitStructure.GPIO_Mode  = GPIO_Mode_Out_PP;	// 设置推挽输出
+    GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;	// 电平切换频率
+    
     // Configure SPI-->NSS as output
     GPIO_InitStructure.GPIO_Pin = NSS_PIN;
     GPIO_Init(NSS_IOPORT, &GPIO_InitStructure);
     GPIO_WriteBit(NSS_IOPORT, NSS_PIN, Bit_SET);
+	
     SpiInit();
 
     //配置复位引脚
